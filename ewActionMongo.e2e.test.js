@@ -214,7 +214,7 @@ describe('[E2E] driver', () => {
     }
   });
 
-  it('must return a fail if trying the insert data in the protected "public" model with "public/insert"', async () => {
+  it.skip('must return a fail if trying the insert data in the protected "public" model with "public/insert"', async () => {
     const idMock = '9';
     const typeMock = 'public/insert'
     const message = buildMessage(idMock, typeMock, owner, [
@@ -224,7 +224,7 @@ describe('[E2E] driver', () => {
     await action(callback)(message)
 
     function callback(response){
-      console.log(response);
+      //console.log(response);
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');

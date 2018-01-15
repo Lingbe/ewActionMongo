@@ -44,7 +44,6 @@ function mongoFn(action){
       args.push(callback);
       const collection = db.collection(coll);
       const fn = collection[dbAction];
-      console.log("ARGS:___________",args);
       fn.apply(collection, args);
 
       function callback(err, response) {
