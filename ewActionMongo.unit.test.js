@@ -10,12 +10,12 @@ const emptySendResponseMock = () => 1;
 const empmessageMock = {};
 
 const mocks = {
-  config     : {},
+  config : {},
   owner  : 1,
   resolve: {}
 };
 
-describe("mongoEventBridge", () => {
+describe("ewActionMongo", () => {
 
   describe('must throw an error if ', () => {
     it('must throw an error if sendResponse is not defined', () => {
@@ -68,7 +68,7 @@ describe('mongoEventBridge -> processEvent', () => {
       const errorMock = new Error(errorMessageMock);
       const sendResponse = sinon.spy();
       const action = sinon.stub().throws(errorMock);
-      const driver = sinon.stub().returns(action);
+      const driver = {find:action};
 
       const bridge = proxyquire('./index', {'./driver': driver});
       const mockPayload = [{_id: 1}];
@@ -80,7 +80,6 @@ describe('mongoEventBridge -> processEvent', () => {
       const processEvent = bridge(mocks.config)(sendResponse);
       await processEvent(messageMock);
 
-      expect(driver.withArgs('find').calledOnce).to.be.equal(true);
       expect(action.calledOnce).to.be.equal(true);
       expect(action.args[0][0]).to.be.equal(mocks.config);
       expect(action.args[0][1]).to.be.equal('user');
@@ -99,7 +98,7 @@ describe('mongoEventBridge -> processEvent', () => {
       const sendResponse = sinon.spy();
       const responseMock = new Object();
       const action = sinon.stub().returns(responseMock);
-      const driver = sinon.stub().returns(action);
+      const driver = {find: action};//sinon.stub().returns(action);
 
       const bridge = proxyquire('./index', {'./driver': driver});
       const mockPayload = [{_id: 1}];
@@ -111,7 +110,7 @@ describe('mongoEventBridge -> processEvent', () => {
       const processEvent = bridge(mocks.config)(sendResponse);
       await processEvent(messageMock);
 
-      expect(driver.withArgs('find').calledOnce).to.be.equal(true);
+      // expect(driver.withArgs('find').calledOnce).to.be.equal(true);
       expect(action.calledOnce).to.be.equal(true);
       expect(action.args[0][0]).to.be.equal(mocks.config);
       expect(action.args[0][1]).to.be.equal('user');
@@ -127,7 +126,7 @@ describe('mongoEventBridge -> processEvent', () => {
       const sendResponse = sinon.spy();
       const responseMock = new Object();
       const action = sinon.stub().returns(responseMock);
-      const driver = sinon.stub().returns(action);
+      const driver = {find: action};
 
       const bridge = proxyquire('./index', {'./driver': driver});
       const mockPayload = 'online';
@@ -139,13 +138,13 @@ describe('mongoEventBridge -> processEvent', () => {
       const processEvent = bridge(mocks.config)(sendResponse);
       await processEvent(messageMock);
 
-      expect(driver.withArgs('find').calledOnce).to.be.equal(true);
       expect(action.calledOnce).to.be.equal(true);
       expect(action.args[0][0]).to.be.equal(mocks.config);
       expect(action.args[0][1]).to.be.equal('user');
-      expect(action.args[0][2]).to.be.an('object');
-      expect(action.args[0][2]).to.have.key('status');
-      expect(action.args[0][2].status).to.be.equal(mockPayload);
+      expect(action.args[0][2]).to.be.an('Array').to.have.lengthOf(1);
+      expect(action.args[0][2][0]).to.be.an('Object');
+      expect(action.args[0][2][0]).to.have.key('status');
+      expect(action.args[0][2][0].status).to.be.equal(mockPayload);
       expect(action.args[0][3]).to.be.equal(mocks.owner);
       expect(sendResponse.calledOnce).to.be.equal(true);
       expect(sendResponse.args[0][0]).to.be.an('object');
@@ -160,7 +159,7 @@ describe('mongoEventBridge -> processEvent', () => {
       const sendResponse = sinon.spy();
       const responseMock = new Object();
       const action = sinon.stub().returns(responseMock);
-      const driver = sinon.stub().returns(action);
+      const driver = {set:action};
 
       const bridge = proxyquire('./index', {'./driver': driver});
       const mockPayload = [{_id: 1}, {status: 'offline'}];
@@ -172,7 +171,6 @@ describe('mongoEventBridge -> processEvent', () => {
       const processEvent = bridge(mocks.config)(sendResponse);
       await processEvent(messageMock);
 
-      expect(driver.withArgs('set').calledOnce).to.be.equal(true);
       expect(action.calledOnce).to.be.equal(true);
       expect(action.args[0][0]).to.be.equal(mocks.config);
       expect(action.args[0][1]).to.be.equal('user');
@@ -188,7 +186,7 @@ describe('mongoEventBridge -> processEvent', () => {
       const sendResponse = sinon.spy();
       const responseMock = new Object();
       const action = sinon.stub().returns(responseMock);
-      const driver = sinon.stub().returns(action);
+      const driver = {set: action};
 
       const bridge = proxyquire('./index', {'./driver': driver});
       const mockPayload = 'online';
@@ -198,15 +196,15 @@ describe('mongoEventBridge -> processEvent', () => {
         owner  : mocks.owner
       };
       const processEvent = bridge(mocks.config)(sendResponse);
-      await processEvent(messageMock);
+      var response = await processEvent(messageMock);
 
-      expect(driver.withArgs('set').calledOnce).to.be.equal(true);
       expect(action.calledOnce).to.be.equal(true);
       expect(action.args[0][0]).to.be.equal(mocks.config);
       expect(action.args[0][1]).to.be.equal('user');
-      expect(action.args[0][2]).to.be.an('object');
-      expect(action.args[0][2]).to.have.key('status');
-      expect(action.args[0][2].status).to.be.equal(mockPayload);
+      expect(action.args[0][2]).to.be.an('Array').to.have.lengthOf(1);
+      expect(action.args[0][2][0]).to.be.an('Object');
+      expect(action.args[0][2][0]).to.have.key('status');
+      expect(action.args[0][2][0].status).to.be.equal(mockPayload);
       expect(action.args[0][3]).to.be.equal(mocks.owner);
       expect(sendResponse.calledOnce).to.be.equal(true);
       expect(sendResponse.args[0][0]).to.be.an('object');
