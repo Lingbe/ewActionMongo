@@ -10,6 +10,6 @@ module.exports = {
   isArray: isActionType(arrayActions)
 };
 
-function isActionType(actionType){
-  return (action) => actionType.indexOf(action) > -1;
+function isActionType(actionType) {
+  return action => actionType.indexOf(action) > -1;
 }

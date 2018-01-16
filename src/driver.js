@@ -1,15 +1,15 @@
-const Cursor = require('mongodb').Cursor;
-const tools  = require('./tools');
+const { Cursor } = require('mongodb');
+const tools = require('./tools');
 
 module.exports = {
-  find     : mongoFn('find'),
-  remove   : mongoFn('remove'),
-  insert   : mongoFn('insert'),
-  set      : mongoFn('set'),
-  unset    : mongoFn('unset'),
-  addToSet : mongoFn('addToSet'),
-  push     : mongoFn('push'),
-  pull     : mongoFn('pull'),
+  find    : mongoFn('find'),
+  remove  : mongoFn('remove'),
+  insert  : mongoFn('insert'),
+  set     : mongoFn('set'),
+  unset   : mongoFn('unset'),
+  addToSet: mongoFn('addToSet'),
+  push    : mongoFn('push'),
+  pull    : mongoFn('pull')
 };
 
 // config: {
@@ -23,28 +23,28 @@ module.exports = {
 //     ...
 //   }
 // }
-function mongoFn(action){
-  return async function(config, coll, args, owner){
-    const db = config.db;
-
-    try{
+function mongoFn(action) {
+  return async function driver(config, coll, args, owner) {
+    const { db } = config;
+    let dbAction;
+    let securedArgs;
+    try {
       await tools.inputValidator(db, coll, args, action);
       const model = tools.getModel(config, coll);
       const data = tools.getData(args, action);
-      if(data && action !== 'unset') tools.schemaValidator(model, coll, data, action);
-      args = tools.formatArgs(args, action);
-      args = tools.secureArgs(model, args, action, owner);
+      if (data && action !== 'unset') tools.schemaValidator(model, coll, data, action);
+      const formatedArgs = tools.formatArgs(args, action);
+      securedArgs = tools.secureArgs(model, formatedArgs, action, owner);
       dbAction = tools.formatAction(action);
-    }
-    catch(e){
+    } catch (e) {
       return Promise.reject(e);
     }
 
     return new Promise((resolve, reject) => {
-      args.push(callback);
+      securedArgs.push(callback);
       const collection = db.collection(coll);
       const fn = collection[dbAction];
-      fn.apply(collection, args);
+      fn.apply(collection, securedArgs);
 
       function callback(err, response) {
         if (err) return reject(err);
@@ -52,7 +52,7 @@ function mongoFn(action){
         return resolve(response);
       }
 
-      function processCursor(cursor){
+      function processCursor(cursor) {
         cursor.toArray((error, data) => {
           (error) ? reject(error) : resolve(data);
         });

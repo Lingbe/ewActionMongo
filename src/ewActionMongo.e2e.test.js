@@ -1,38 +1,38 @@
-const expect = require('chai').expect;
-const MongoClient  = require('mongodb').MongoClient;
+/* eslint no-shadow: ["error", { "allow": ["owner"] }] */
+
+const { expect } = require('chai');
+const { MongoClient }  = require('mongodb');
 const ObjectId = require('mongodb').ObjectID;
+
 const MongoUrlConn = 'mongodb://localhost:27017';
 const dbName = 'mongoEventBridgeFull';
 
 const userSchemaMock   = require('./userSchemaMock');
 const publicSchemaMock = require('./userSchemaMock');
 const ewActionMongo = require('./index');
+
 const coll = 'user';
 const owner = new ObjectId();
-const mockFriend = new ObjectId();
 
 let client;
-let userColl;
-let dbStub;
 let insertedObjectId;
 const config = {
-  db: undefined,
+  db    : undefined,
   models: {
-    user  : {schema: userSchemaMock,   private: true},
-    public: {schema: publicSchemaMock, actions: ['find']}
+    user  : { schema: userSchemaMock,   private: true },
+    public: { schema: publicSchemaMock, actions: ['find'] }
   }
-}
+};
 
 const action = ewActionMongo(config);
 
 describe('[E2E] driver', () => {
-
   before('open and clean MongoDB connection', (done) => {
     MongoClient.connect(MongoUrlConn, (err, dbClient) => {
       if (err) throw err;
       client = dbClient;
       config.db = client.db(dbName);
-      config.db.collection('public').insert({name: "hello world"});
+      config.db.collection('public').insert({ name: 'hello world' });
       done();
     });
   });
@@ -47,43 +47,42 @@ describe('[E2E] driver', () => {
 
   it('must insert a new user with the type "user/insert"', async () => {
     const idMock = '1';
-    const typeMock = 'user/insert'
+    const typeMock = 'user/insert';
     const message = {
-      id: idMock,
-      status: 'request',
-      type: typeMock,
-      owner: owner,
+      id     : idMock,
+      status : 'request',
+      type   : typeMock,
+      owner,
       payload: {
-        name: 'john doe',
-        age: 25,
+        name  : 'john doe',
+        age   : 25,
         status: 'online'
       }
     };
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
+    function callback(response) {
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
       expect(response.type).to.be.equal(typeMock);
       expect(response.payload).to.be.an('Object');
       expect(response.payload.insertedCount).to.be.equal(1);
-      insertedObjectId = response.payload.insertedIds[0];
+      [insertedObjectId] = response.payload.insertedIds;
     }
   });
 
   it('must insert a new user with the type "user/find"', async () => {
     const idMock = '2';
-    const typeMock = 'user/find'
+    const typeMock = 'user/find';
     const message = buildMessage(idMock, typeMock, owner, {
       _id: insertedObjectId
     });
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
-
+    function callback(response) {
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
@@ -95,14 +94,14 @@ describe('[E2E] driver', () => {
 
   it('must set a new status in the user with the type "user/set"', async () => {
     const idMock = '3';
-    const typeMock = 'user/set'
+    const typeMock = 'user/set';
     const message = buildMessage(idMock, typeMock, owner, [
-      {_id: insertedObjectId}, {status:'offline'}
+      { _id: insertedObjectId }, { status: 'offline' }
     ]);
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
+    function callback(response) {
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
@@ -115,14 +114,14 @@ describe('[E2E] driver', () => {
 
   it.skip('must set a new status in the user with the type "user/set/status"', async () => {
     const idMock = '4';
-    const typeMock = 'user/set'
+    const typeMock = 'user/set';
     const message = buildMessage(idMock, typeMock, owner, [
-      {_id: insertedObjectId}, 'online'
+      { _id: insertedObjectId }, 'online'
     ]);
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
+    function callback(response) {
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
@@ -135,18 +134,20 @@ describe('[E2E] driver', () => {
 
   it('must set a new status in the user with the type "user/push"', async () => {
     const idMock = '5';
-    const typeMock = 'user/push'
+    const typeMock = 'user/push';
     const message = buildMessage(idMock, typeMock, owner, [
-      {_id: insertedObjectId}, {lang: {
-        "code"  : 'ES',
-        "native": true,
-        "level" : 2
-      }}
+      { _id: insertedObjectId }, {
+        lang: {
+          code  : 'ES',
+          native: true,
+          level : 2
+        }
+      }
     ]);
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
+    function callback(response) {
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
@@ -159,14 +160,14 @@ describe('[E2E] driver', () => {
 
   it('must insert a new user with the type "user/find"', async () => {
     const idMock = '6';
-    const typeMock = 'user/find'
+    const typeMock = 'user/find';
     const message = buildMessage(idMock, typeMock, owner, {
       _id: insertedObjectId
     });
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
+    function callback(response) {
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
       expect(response.type).to.be.equal(typeMock);
@@ -174,20 +175,19 @@ describe('[E2E] driver', () => {
       expect(response.payload[0].name).to.be.equal('john doe');
       expect(response.payload[0].lang).to.be.an('Array').to.have.lengthOf(1);
       expect(response.payload[0].lang[0].code).to.be.equal('ES');
-
     }
   });
 
   it('must return a fail when the validation fails with the type "user/insert"', async () => {
     const idMock = '7';
-    const typeMock = 'user/insert'
+    const typeMock = 'user/insert';
     const message = buildMessage(idMock, typeMock, owner, {
       status: 'wrong'
     });
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
+    function callback(response) {
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('fail');
@@ -198,12 +198,12 @@ describe('[E2E] driver', () => {
 
   it('must return data from the "public" model with "public/find"', async () => {
     const idMock = '8';
-    const typeMock = 'public/find'
+    const typeMock = 'public/find';
     const message = buildMessage(idMock, typeMock, owner, {});
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
+    function callback(response) {
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
@@ -216,15 +216,15 @@ describe('[E2E] driver', () => {
 
   it.skip('must return a fail if trying the insert data in the protected "public" model with "public/insert"', async () => {
     const idMock = '9';
-    const typeMock = 'public/insert'
+    const typeMock = 'public/insert';
     const message = buildMessage(idMock, typeMock, owner, [
-      {name: 'hello world'},{do: 'something'}
+      { name: 'hello world' }, { do: 'something' }
     ]);
 
-    await action(callback)(message)
+    await action(callback)(message);
 
-    function callback(response){
-      //console.log(response);
+    function callback(response) {
+      // console.log(response);
       expect(response).to.be.an('Object');
       expect(response.id).to.be.equal(idMock);
       expect(response.status).to.be.equal('response');
@@ -234,16 +234,15 @@ describe('[E2E] driver', () => {
       expect(response.payload[0].name).to.be.equal('hello world');
     }
   });
-
 });
 
-function buildMessage(id, type, owner, payload){
+function buildMessage(id, type, owner, payload) {
   const msg = {
-    id: id,
+    id,
     status: 'request',
-    type: type,
-    payload: payload
+    type,
+    payload
   };
-  if(owner) msg.owner = owner;
+  if (owner) msg.owner = owner;
   return msg;
 }
