@@ -17,7 +17,7 @@ let dbStub;
 const config = {
   db: undefined,
   models: {user: {schema: userSchemaMock, private: true}}
-}
+};
 
 
 describe('[E2E] driver', () => {
