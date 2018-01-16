@@ -2,9 +2,9 @@
   "name": "ew-action-mongodb",
   "version": "0.1.2",
   "description": "Mongo Action connector for eWings framework",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "node ./node_modules/istanbul/lib/cli.js cover -x '*.test.js' _mocha -- -R spec *.test.js",
+    "test": "node ./node_modules/istanbul/lib/cli.js cover -x 'src/*.test.js' _mocha -- -R spec src/*.test.js",
     "coveralls": "npm test -- --report lcovonly && cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
