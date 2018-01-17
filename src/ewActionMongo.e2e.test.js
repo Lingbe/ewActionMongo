@@ -1,4 +1,7 @@
-/* eslint no-shadow: ["error", { "allow": ["owner"] }] */
+/* eslint
+  no-shadow: ["error", { "allow": ["owner"] }]
+  prefer-destructuring: ["off"]
+*/
 
 const { expect } = require('chai');
 const { MongoClient }  = require('mongodb');
@@ -69,7 +72,7 @@ describe('[E2E] driver', () => {
       expect(response.type).to.be.equal(typeMock);
       expect(response.payload).to.be.an('Object');
       expect(response.payload.insertedCount).to.be.equal(1);
-      [insertedObjectId] = response.payload.insertedIds;
+      insertedObjectId = response.payload.insertedIds[0];
     }
   });
 

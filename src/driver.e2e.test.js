@@ -68,10 +68,7 @@ describe('[E2E] driver', () => {
     it('must update the selected data', async () => {
       const result = await driver.set(config, coll, [{ status: 'online' }, { name: 'test' }], owner);
       expect(result).to.have.keys('result', 'message', 'connection');
-      expect(result.result).to.have.keys('ok', 'n', 'nModified');
-      expect(result.result.ok).to.be.equal(1);
-      expect(result.result.n).to.be.equal(1);
-      expect(result.result.nModified).to.be.equal(1);
+      expect(result.result).to.deep.equal({ ok: 1, n: 1, nModified: 1 });
     });
 
     it('must read the previosly modified data', async () => {
