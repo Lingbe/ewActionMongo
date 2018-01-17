@@ -1,6 +1,6 @@
 {
   "name": "ew-action-mongodb",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Mongo Action connector for eWings framework",
   "main": "src/index.js",
   "scripts": {
