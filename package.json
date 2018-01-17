@@ -12,7 +12,9 @@
     "type": "git",
     "url": "git+https://joviwap@github.com/Lingbe/ewActionMongo.git"
   },
-  "env": [ "mocha" ],
+  "env": [
+    "mocha"
+  ],
   "keywords": [
     "mongodb",
     "db",
