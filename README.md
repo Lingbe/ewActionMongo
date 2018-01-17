@@ -30,16 +30,16 @@ npm test
 
 *eWing Mongo Action* allows you to transform simple object event into complex mongoDB actions without loosing the control of your backend. This is specially usefull when you have an event based frontend like React or Polymer. A event processable by the *eWing Mongo Action* will look like:
 
-```
+```json
 {
-  id     : 1,
-  status : 'request',
-  type   : 'user/insert',
-  owner  : 'owner',
-  payload: {
-    name  : 'john doe',
-    age   : 25,
-    status: 'online'
+  "id"     : 1,
+  "status" : "request",
+  "type"   : "user/insert",
+  "owner"  : "owner",
+  "payload": {
+    "name"  : "john doe",
+    "age"   : 25,
+    "status": "online"
   }
 };
 ```
@@ -50,8 +50,8 @@ This action will **insert** a new document in the **user collection** containing
 
 Every event must follow the following pattern in order to be processed by the *eWing Mongo Action* library:
 
-```
-${collection}/${action}/${parameter}
+```javascript
+const eventType = `${collection}/${action}/${parameter}`;
 ```
 
 Collection and action are mandatory of the event type, while parametes is option. An action can only have one of the follow values:
@@ -67,7 +67,8 @@ Collection and action are mandatory of the event type, while parametes is option
 ## Setup
 
 In order to setup the eWing Mongo Action we need a connection to mongoDB and define the model behaviour.
-```
+
+```javascript
 const eWings = require('ewings');
 const ewActionMongo = require('ew-action-mongodb');
 const models = require('./models');
@@ -77,7 +78,7 @@ const config = {
   models: models,
 }
 const mongoAction = ewActionMongo(config);
-const interfaces = []
+const interfaces = [];
 
 eWings.init(interfaces, [mongoAction]);
 ```
@@ -86,7 +87,7 @@ eWings.init(interfaces, [mongoAction]);
 
 In order to setup the eWing Mongo Action we need a connection to mongoDB. This can be archived with the following code:
 
-```
+```javascript
 let db:
 MongoClient.connect(MongoUrlConn, (err, client) => {
   if (err) throw err;
@@ -101,10 +102,16 @@ If you require extra instructions to setup you mongoDB connection, please check 
 ### Model definition
 The model object defines all the collections that could be manipulated throw the *eWing Mongo Action* instance. This is an example:
 
-```
+```javascript
 const models = {
-  user: { schema: userSchemaMock, roles: roles },
-  jobs: { schema: jobsSchemaMock, actions: ['find'] }
+  user: {
+    schema: userSchemaMock,
+    roles: roles
+  },
+  jobs: {
+    schema: jobsSchemaMock,
+    actions: ['find']
+  }
 }
 ```
 
